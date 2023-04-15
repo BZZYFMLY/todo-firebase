@@ -94,6 +94,11 @@ button:hover {
   margin: 1rem 0;
 }
 
+.todo-container h2.done {
+  text-decoration: line-through;
+  color: #AC485A;
+}
+
 .todo-container p {
   font-size: 1rem;
   margin: 1rem 0;
