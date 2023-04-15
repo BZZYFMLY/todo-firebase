@@ -21,6 +21,8 @@ const todoListInDb = ref(db, dbName);
 const inputFieldEl = document.querySelector("#input-field");
 const addButtonEl = document.querySelector("#add-button");
 const listEl = document.querySelector("#list");
+const editModalEl = document.querySelector("#edit-modal");
+const deleteModalEl = document.querySelector("#delete-modal");
 
 const createRecord = (title) => {
   return {
@@ -112,9 +114,20 @@ const addToList = (record) => {
             event: {
               type: "click",
               handler: () => {
-                const elemInDb = ref(db, `${dbName}/${record.id}`);
-                remove(elemInDb);
-                console.log("Deleted element:", record);
+                deleteModalEl.classList.remove("closed");
+                deleteModalEl
+                  .querySelector("#delete-button")
+                  .addEventListener("click", () => {
+                    const elemInDb = ref(db, `${dbName}/${record.id}`);
+                    remove(elemInDb);
+                    console.log("Deleted element:", record);
+                    deleteModalEl.classList.add("closed");
+                  });
+                deleteModalEl
+                  .querySelector("#cancel-button")
+                  .addEventListener("click", () => {
+                    deleteModalEl.classList.add("closed");
+                  });
               },
             },
             children: {
