@@ -27,31 +27,21 @@ const createRecord = (title) => {
   };
 };
 
-const addToList = (record) => {
-  push(shopppingListInDb, record);
-  listEl.innerHTML += `<li>${record.title}</li>`;
-  console.log("record added:", record);
-};
+const addToList = (record) => (listEl.innerHTML += `<li>${record.title}</li>`);
+const addToDB = (record) => push(shopppingListInDb, record);
+const resetInputField = () => (inputFieldEl.value = "");
+const resetList = () => (listEl.innerHTML = "");
 
-const resetInputField = () => {
-  inputFieldEl.value = "";
-};
-
-onValue(shopppingListInDb, function (snapshot) {
+onValue(shopppingListInDb, (snapshot) => {
   let shopppingListArray = Object.values(snapshot.val());
-
-  // Challenge: Write a for loop where you console log each book.
-  for (let i = 0; i < shopppingListArray.length; i++) {
-    let shoppingItem = shopppingListArray[i];
-
-    console.log(shoppingItem);
-  }
+  resetList();
+  shopppingListArray.forEach((shoppingItem) => addToList(shoppingItem));
 });
 
 addButtonEl.addEventListener("click", () => {
   if (inputFieldEl.value === "") return;
   const inputValue = inputFieldEl.value;
   const record = createRecord(inputValue);
-  addToList(record);
+  addToDB(record);
   resetInputField();
 });
