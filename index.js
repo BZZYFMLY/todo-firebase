@@ -130,12 +130,10 @@ const resetInputField = () => (inputFieldEl.value = "");
 const resetList = () => (listEl.innerHTML = "");
 
 onValue(todoListInDb, (snapshot) => {
-  snapshot.val() === null && resetList();
-  let shopppingListArray = Object.entries(snapshot.val());
   resetList();
-  shopppingListArray.forEach(([id, shoppingItem]) =>
-    addToList({id, ...shoppingItem})
-  );
+  if (!snapshot?.val()) return;
+  let todoListArray = Object.entries(snapshot.val());
+  todoListArray.forEach(([id, todoItem]) => addToList({id, ...todoItem}));
 });
 
 addButtonEl.addEventListener("click", () => {
