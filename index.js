@@ -5,6 +5,7 @@ import {
   push,
   onValue,
   remove,
+  update,
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
 const appSettings = {
@@ -75,6 +76,7 @@ const addToList = (record) => {
         children: [
           {
             tag: "h2",
+            className: record.isDone ? "done" : null,
             text: record.title,
           },
           {
@@ -93,6 +95,8 @@ const addToList = (record) => {
             event: {
               type: "click",
               handler: () => {
+                const elemInDb = ref(db, `${dbName}/${record.id}`);
+                update(elemInDb, {isDone: !record.isDone});
                 console.log("check", record.id);
               },
             },
