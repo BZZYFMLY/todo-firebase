@@ -3,7 +3,7 @@ import {
   getDatabase,
   ref,
   push,
-  set,
+  onValue,
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
 const appSettings = {
@@ -18,19 +18,40 @@ const inputFieldEl = document.querySelector("#input-field");
 const addButtonEl = document.querySelector("#add-button");
 const listEl = document.querySelector("#list");
 
-addButtonEl.addEventListener("click", () => {
-  if (inputFieldEl.value === "") {
-    return;
-  }
-  const inputValue = inputFieldEl.value;
-  const record = {
-    title: inputValue,
+const createRecord = (title) => {
+  return {
+    title,
     isWatched: false,
     isDone: false,
     date: new Date().toISOString(),
   };
+};
+
+const addToList = (record) => {
   push(shopppingListInDb, record);
-  inputFieldEl.value = "";
+  listEl.innerHTML += `<li>${record.title}</li>`;
   console.log("record added:", record);
-  listEl.innerHTML += `<li>${inputValue}</li>`;
+};
+
+const resetInputField = () => {
+  inputFieldEl.value = "";
+};
+
+onValue(shopppingListInDb, function (snapshot) {
+  let shopppingListArray = Object.values(snapshot.val());
+
+  // Challenge: Write a for loop where you console log each book.
+  for (let i = 0; i < shopppingListArray.length; i++) {
+    let shoppingItem = shopppingListArray[i];
+
+    console.log(shoppingItem);
+  }
+});
+
+addButtonEl.addEventListener("click", () => {
+  if (inputFieldEl.value === "") return;
+  const inputValue = inputFieldEl.value;
+  const record = createRecord(inputValue);
+  addToList(record);
+  resetInputField();
 });
