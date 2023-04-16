@@ -56,14 +56,14 @@ button {
 
 button img {
   margin: 0;
-  max-width: 2rem;
-  min-height: 2rem;
+  max-width: 1.5rem;
+  min-height: 1.5rem;
 }
 
 button:hover {
   background-color: #AC485A;
   opacity: 0.8;
-  box-shadow: 1px 2px 5px 0px rgba(0,0,0,1);
+  box-shadow: 1px 2px 5px 0px rgb(99, 92, 92);
 }
 
 #list {
