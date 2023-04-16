@@ -173,18 +173,17 @@ button:hover {
     width: 100%;
   }
   #list {
+    margin: auto;
     padding: 0 2rem;
     flex-flow: row wrap;
     gap: 1rem;
-    justify-content: flex-start;
-  }
-  #list::after {
-    content: "";
-    flex: auto;
+    justify-content: space-around;
   }
 
   .todo-container {
-    width: 320px;
+    flex:1;
+    min-width: 320px;
+    max-width: 360px;
   }
 
 }
