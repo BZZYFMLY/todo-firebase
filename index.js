@@ -39,7 +39,7 @@ const createRecord = (title) => {
     title,
     isWatched: false,
     isDone: false,
-    date: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   };
 };
 
@@ -116,7 +116,7 @@ const renderTodo = (record) => {
           },
           {
             tag: "p",
-            text: record.date,
+            text: record.isDone ? record.createdAt : record.doneAt,
           },
         ],
       },
@@ -131,7 +131,10 @@ const renderTodo = (record) => {
               type: "click",
               handler: () => {
                 const elemInDb = ref(db, `${dbName}/${record.id}`);
-                update(elemInDb, {isDone: !record.isDone});
+                update(elemInDb, {
+                  isDone: !record.isDone,
+                  doneAt: new Date().toISOString(),
+                });
                 console.log("check", record.id);
               },
             },
