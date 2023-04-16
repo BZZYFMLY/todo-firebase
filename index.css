@@ -36,11 +36,12 @@ input, button {
   color: #432000;
   background-color: #DCE1EB;
   border: 0;
-  padding: 1rem 2rem;
+  padding: 1rem 1rem;
   border-radius: 1rem;
   font-size: 1.5rem;
   text-align: center;
   width: 320px;
+  outline: none;
   box-shadow: 1px 2px 5px 0px rgba(0,0,0,0.75);
 }
 button {
@@ -78,7 +79,7 @@ button:hover {
 
 .todo-container {
   box-shadow: 1px 2px 5px 0px rgba(0,0,0,0.75);
-  padding: 1rem 2rem;
+  padding: 1rem 1rem;
   background-color: #DCE1EB;
   border-radius: 1rem;
   margin: 1rem 0;
@@ -117,7 +118,7 @@ button:hover {
   gap: 1rem;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
 }
 
@@ -159,4 +160,9 @@ button:hover {
   justify-content: center;
   gap: 1rem;
   width: 100%;
+}
+
+#edit-field {
+  width:100%;
+  margin: 1rem 0;
 }
