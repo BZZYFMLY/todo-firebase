@@ -49,6 +49,7 @@ const createElem = ({
   id,
   className,
   text,
+  html,
   data,
   src,
   alt,
@@ -67,6 +68,7 @@ const createElem = ({
   if (typeof event === "object") {
     elem.addEventListener(event.type, event.handler);
   }
+  if (html) elem.innerHTML = html;
   if (typeof data === "object") {
     Object.entries(data).forEach(([key, value]) => {
       elem.dataset[key] = value;
@@ -101,7 +103,7 @@ const getElapsedTime = (date) => {
     {value: minutes, name: "minute"},
     {value: seconds, name: "second"},
   ]
-    .filter((el) => el.value > 0)
+    .filter((el) => el.value > 0 || el.name === "second")
     .reduce((acc, el) => {
       if (el.value === 1) {
         return `${acc} ${el.value} ${el.name}`;
@@ -183,7 +185,7 @@ const renderTodo = (record) => {
               doneAt: record.doneAt,
               isDone: record.isDone,
             },
-            text: getTimeText(record),
+            html: getTimeText(record),
           },
         ],
       },
