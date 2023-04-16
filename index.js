@@ -83,15 +83,33 @@ const createElem = ({
 };
 
 const getElapsedTime = (date) => {
-  if (!date) return "N/A";
-  const timestamp = new Date(date);
-  const now = new Date();
-  const secondsAgo = Math.round((now - timestamp) / 1000);
+  const startDate = new Date(date);
+  const endDate = new Date();
 
-  const formatter = new Intl.RelativeTimeFormat("en", {style: "narrow"});
-  const relativeTime = formatter.format(-secondsAgo, "second") ?? 0;
+  const elapsedTime = endDate.getTime() - startDate.getTime();
 
-  return relativeTime;
+  const days = Math.floor(elapsedTime / (24 * 60 * 60 * 1000));
+  const hours = Math.floor(
+    (elapsedTime % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)
+  );
+  const minutes = Math.floor((elapsedTime % (60 * 60 * 1000)) / (60 * 1000));
+  const seconds = Math.floor((elapsedTime % (60 * 1000)) / 1000);
+
+  const formattedElapsedTime = [
+    {value: days, name: "day"},
+    {value: hours, name: "hour"},
+    {value: minutes, name: "minute"},
+    {value: seconds, name: "second"},
+  ]
+    .filter((el) => el.value > 0)
+    .reduce((acc, el) => {
+      if (el.value === 1) {
+        return `${acc} ${el.value} ${el.name}`;
+      }
+      return `${acc} ${el.value} ${el.name}s`;
+    }, "");
+
+  return formattedElapsedTime;
 };
 
 // handling the editing of the todo item
@@ -128,15 +146,15 @@ const getTimeText = (record) => {
   createdAt = valueCheck(createdAt);
   doneAt = valueCheck(doneAt);
 
-  if (isDone && doneAt) return `Task done at: ${getElapsedTime(doneAt)}`;
+  if (isDone && doneAt) return `Task done at:<br/>${getElapsedTime(doneAt)}`;
   if (!isDone && createdAt)
-    return `Task created at: ${getElapsedTime(createdAt)}`;
+    return `Task created at:<br/>${getElapsedTime(createdAt)}`;
 };
 
 setInterval(() => {
   document.querySelectorAll(".time").forEach((timeEl) => {
     const {isDone, createdAt, doneAt} = timeEl.dataset;
-    timeEl.textContent = getTimeText({isDone, createdAt, doneAt});
+    timeEl.innerHTML = getTimeText({isDone, createdAt, doneAt});
   });
 }, 500);
 
