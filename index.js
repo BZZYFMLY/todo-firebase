@@ -9,7 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
 const appSettings = {
-  databaseURL: `https://shoppinglist-42646-default-rtdb.europe-west1.firebasedatabase.app/`,
+  databaseURL: `https://todo-1438e-default-rtdb.europe-west1.firebasedatabase.app/`,
 };
 
 const dbName = "todos";
