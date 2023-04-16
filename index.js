@@ -37,9 +37,9 @@ const editFieldEl = document.querySelector("#edit-field");
 const createRecord = (title) => {
   return {
     title,
-    isWatched: false,
     isDone: false,
     createdAt: new Date().toISOString(),
+    doneAt: null,
   };
 };
 
@@ -49,6 +49,7 @@ const createElem = ({
   id,
   className,
   text,
+  data,
   src,
   alt,
   parent,
@@ -66,6 +67,11 @@ const createElem = ({
   if (typeof event === "object") {
     elem.addEventListener(event.type, event.handler);
   }
+  if (typeof data === "object") {
+    Object.entries(data).forEach(([key, value]) => {
+      elem.dataset[key] = value;
+    });
+  }
   const newChildren =
     !!children && !Array.isArray(children) ? [children] : children;
 
@@ -76,12 +82,23 @@ const createElem = ({
   return elem;
 };
 
+const getElapsedTime = (date) => {
+  if (!date) return "N/A";
+  const timestamp = new Date(date);
+  const now = new Date();
+  const secondsAgo = Math.round((now - timestamp) / 1000);
+
+  const formatter = new Intl.RelativeTimeFormat("en", {style: "narrow"});
+  const relativeTime = formatter.format(-secondsAgo, "second") ?? 0;
+
+  return relativeTime;
+};
+
 // handling the editing of the todo item
 const handleEdit = (record) => {
   const elemInDb = ref(db, `${dbName}/${record.id}`);
   if (editFieldEl.value !== "") {
     update(elemInDb, {...record, title: editFieldEl.value});
-    console.log("Edited element:", record);
     editModalEl.classList.add("closed");
     editFieldEl.value = "";
     editModalEl.removeEventListener("click", handleEdit);
@@ -92,10 +109,36 @@ const handleEdit = (record) => {
 const handleDelete = (record) => {
   const elemInDb = ref(db, `${dbName}/${record.id}`);
   remove(elemInDb);
-  console.log("Deleted element:", record);
   deleteModalEl.classList.add("closed");
   editModalEl.removeEventListener("click", handleDelete);
 };
+
+const getTimeText = (record) => {
+  let {isDone, createdAt, doneAt} = record;
+
+  const valueCheck = (value) => {
+    if (value === "false") return false;
+    if (value === "true") return true;
+    if (value === "null") return null;
+    if (value === "undefined") return undefined;
+    return value;
+  };
+
+  isDone = valueCheck(isDone);
+  createdAt = valueCheck(createdAt);
+  doneAt = valueCheck(doneAt);
+
+  if (isDone && doneAt) return `Task done at: ${getElapsedTime(doneAt)}`;
+  if (!isDone && createdAt)
+    return `Task created at: ${getElapsedTime(createdAt)}`;
+};
+
+setInterval(() => {
+  document.querySelectorAll(".time").forEach((timeEl) => {
+    const {isDone, createdAt, doneAt} = timeEl.dataset;
+    timeEl.textContent = getTimeText({isDone, createdAt, doneAt});
+  });
+}, 500);
 
 // this method renders the todo item
 const renderTodo = (record) => {
@@ -116,7 +159,13 @@ const renderTodo = (record) => {
           },
           {
             tag: "p",
-            text: record.isDone ? record.createdAt : record.doneAt,
+            className: "time",
+            data: {
+              createdAt: record.createdAt,
+              doneAt: record.doneAt,
+              isDone: record.isDone,
+            },
+            text: getTimeText(record),
           },
         ],
       },
@@ -133,9 +182,8 @@ const renderTodo = (record) => {
                 const elemInDb = ref(db, `${dbName}/${record.id}`);
                 update(elemInDb, {
                   isDone: !record.isDone,
-                  doneAt: new Date().toISOString(),
+                  doneAt: !record.isDone ? new Date().toISOString() : null,
                 });
-                console.log("check", record.id);
               },
             },
             children: {
@@ -150,6 +198,7 @@ const renderTodo = (record) => {
             event: {
               type: "click",
               handler: () => {
+                editFieldEl.value = record.title;
                 editModalEl.classList.remove("closed");
                 editModalEl
                   .querySelector("#save-button")
