@@ -21,6 +21,7 @@ const todoListInDb = ref(db, dbName);
 const inputFieldEl = document.querySelector("#input-field");
 const addButtonEl = document.querySelector("#add-button");
 const listEl = document.querySelector("#list");
+const editFieldEl = document.querySelector("#edit-field");
 const editModalEl = document.querySelector("#edit-modal");
 const deleteModalEl = document.querySelector("#delete-modal");
 
@@ -63,6 +64,25 @@ const createElem = ({
 
   parent && parent.appendChild(elem);
   return elem;
+};
+
+const handleEdit = (record) => {
+  const elemInDb = ref(db, `${dbName}/${record.id}`);
+  if (editFieldEl.value !== "") {
+    update(elemInDb, {...record, title: editFieldEl.value});
+    console.log("Edited element:", record);
+    editModalEl.classList.add("closed");
+    editFieldEl.value = "";
+    editModalEl.removeEventListener("click", handleEdit);
+  }
+};
+
+const handleDelete = (record) => {
+  const elemInDb = ref(db, `${dbName}/${record.id}`);
+  remove(elemInDb);
+  console.log("Deleted element:", record);
+  deleteModalEl.classList.add("closed");
+  editModalEl.removeEventListener("click", handleDelete);
 };
 
 const addToList = (record) => {
@@ -110,6 +130,31 @@ const addToList = (record) => {
           },
           {
             tag: "button",
+            className: "btn btn-danger edit",
+            event: {
+              type: "click",
+              handler: () => {
+                editModalEl.classList.remove("closed");
+                editModalEl
+                  .querySelector("#save-button")
+                  .addEventListener("click", () => {
+                    handleEdit(record);
+                  });
+                editModalEl
+                  .querySelector("#cancel-edit-button")
+                  .addEventListener("click", () => {
+                    editModalEl.classList.add("closed");
+                  });
+              },
+            },
+            children: {
+              tag: "img",
+              src: "assets/edit.png",
+              alt: "delete",
+            },
+          },
+          {
+            tag: "button",
             className: "btn btn-danger delete",
             event: {
               type: "click",
@@ -118,10 +163,7 @@ const addToList = (record) => {
                 deleteModalEl
                   .querySelector("#delete-button")
                   .addEventListener("click", () => {
-                    const elemInDb = ref(db, `${dbName}/${record.id}`);
-                    remove(elemInDb);
-                    console.log("Deleted element:", record);
-                    deleteModalEl.classList.add("closed");
+                    handleDelete(record);
                   });
                 deleteModalEl
                   .querySelector("#cancel-button")
