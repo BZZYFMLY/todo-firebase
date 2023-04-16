@@ -8,23 +8,32 @@ import {
   update,
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
+// Your web app's Firebase configuration
 const appSettings = {
   databaseURL: `https://todo-1438e-default-rtdb.europe-west1.firebasedatabase.app/`,
 };
 
+// the name of the database
 const dbName = "todos";
 
+// Initialize Firebase
 const app = initializeApp(appSettings);
 const db = getDatabase(app);
 const todoListInDb = ref(db, dbName);
 
+// Add elements
 const inputFieldEl = document.querySelector("#input-field");
 const addButtonEl = document.querySelector("#add-button");
-const listEl = document.querySelector("#list");
-const editFieldEl = document.querySelector("#edit-field");
-const editModalEl = document.querySelector("#edit-modal");
-const deleteModalEl = document.querySelector("#delete-modal");
 
+// List elements
+const listEl = document.querySelector("#list");
+
+// Modals
+const deleteModalEl = document.querySelector("#delete-modal");
+const editModalEl = document.querySelector("#edit-modal");
+const editFieldEl = document.querySelector("#edit-field");
+
+// this is the DTO for the todo item
 const createRecord = (title) => {
   return {
     title,
@@ -34,6 +43,7 @@ const createRecord = (title) => {
   };
 };
 
+// this method renders HTML elements
 const createElem = ({
   tag,
   id,
@@ -66,6 +76,7 @@ const createElem = ({
   return elem;
 };
 
+// handling the editing of the todo item
 const handleEdit = (record) => {
   const elemInDb = ref(db, `${dbName}/${record.id}`);
   if (editFieldEl.value !== "") {
@@ -77,6 +88,7 @@ const handleEdit = (record) => {
   }
 };
 
+// handling the deletion of the todo item
 const handleDelete = (record) => {
   const elemInDb = ref(db, `${dbName}/${record.id}`);
   remove(elemInDb);
@@ -85,7 +97,8 @@ const handleDelete = (record) => {
   editModalEl.removeEventListener("click", handleDelete);
 };
 
-const addToList = (record) => {
+// this method renders the todo item
+const renderTodo = (record) => {
   createElem({
     tag: "li",
     className: "todo-container",
@@ -184,17 +197,24 @@ const addToList = (record) => {
   });
 };
 
+// adding the todo item to the database
 const addToDB = (record) => push(todoListInDb, record);
+
+// reset the input field
 const resetInputField = () => (inputFieldEl.value = "");
+
+// reset the list
 const resetList = () => (listEl.innerHTML = "");
 
+// this method listens to the database and renders the todo items
 onValue(todoListInDb, (snapshot) => {
   resetList();
   if (!snapshot?.val()) return;
   let todoListArray = Object.entries(snapshot.val());
-  todoListArray.forEach(([id, todoItem]) => addToList({id, ...todoItem}));
+  todoListArray.forEach(([id, todoItem]) => renderTodo({id, ...todoItem}));
 });
 
+// add event listener to the add button
 addButtonEl.addEventListener("click", () => {
   if (inputFieldEl.value === "") return;
   const inputValue = inputFieldEl.value;
