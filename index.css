@@ -33,7 +33,7 @@
   margin-bottom: 0.5rem;
 }
 
-input, button {
+input[type="text"], button {
   color: #432000;
   background-color: #DCE1EB;
   border: 0;
@@ -166,6 +166,29 @@ button:hover {
 #edit-field {
   width:100%;
   margin: 1rem 0;
+}
+
+#show {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-width: 320px;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #DCE1EB;
+  border-radius: 1rem;
+  box-shadow: 1px 2px 5px 0px rgba(0,0,0,0.75);
+}
+
+#show label {
+  margin-left: 0.5rem;
+}
+
+
+#show label input {
+  margin-right: 0.25rem;
 }
 
 @media (min-width: 600px) {
