@@ -118,7 +118,7 @@ const getElapsedTime = (date) => {
 const handleEdit = (record) => {
   const elemInDb = ref(db, `${dbName}/${record.id}`);
   if (editFieldEl.value !== "") {
-    update(elemInDb, {...record, title: editFieldEl.value});
+    update(elemInDb, {title: editFieldEl.value});
     editModalEl.classList.add("closed");
     editFieldEl.value = "";
     editModalEl.removeEventListener("click", handleEdit);
