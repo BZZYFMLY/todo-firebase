@@ -283,7 +283,14 @@ onValue(todoListInDb, (snapshot) => {
   resetList();
   if (!snapshot?.val()) return;
   let todoListArray = Object.entries(snapshot.val());
-  todoListArray.forEach(([id, todoItem]) => renderTodo({id, ...todoItem}));
+  const sortedTodoListArray = todoListArray.sort((a, b) => {
+    const aDate = new Date(a[1].createdAt);
+    const bDate = new Date(b[1].createdAt);
+    return bDate - aDate;
+  });
+  sortedTodoListArray.forEach(([id, todoItem]) =>
+    renderTodo({id, ...todoItem})
+  );
 });
 
 // add event listener to the add button
