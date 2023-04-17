@@ -284,8 +284,12 @@ onValue(todoListInDb, (snapshot) => {
   if (!snapshot?.val()) return;
   let todoListArray = Object.entries(snapshot.val());
   const sortedTodoListArray = todoListArray.sort((a, b) => {
-    const aDate = new Date(a[1].createdAt);
-    const bDate = new Date(b[1].createdAt);
+    const aDate = a[1].isDone
+      ? new Date(a[1].doneAt)
+      : new Date(a[1].createdAt);
+    const bDate = a[1].isDone
+      ? new Date(b[1].doneAt)
+      : new Date(b[1].createdAt);
     return bDate - aDate;
   });
   sortedTodoListArray.forEach(([id, todoItem]) =>
