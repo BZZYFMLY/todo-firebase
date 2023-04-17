@@ -174,7 +174,7 @@ button:hover {
   }
   #list {
     margin: auto;
-    padding: 0 2rem;
+    padding: 0 4rem;
     flex-flow: row wrap;
     gap: 1rem;
     justify-content: space-around;
@@ -183,7 +183,7 @@ button:hover {
   .todo-container {
     flex:1;
     min-width: 320px;
-    max-width: 360px;
+    max-width: 420px;
   }
 
 }
