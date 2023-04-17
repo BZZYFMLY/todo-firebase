@@ -21,6 +21,9 @@ const app = initializeApp(appSettings);
 const db = getDatabase(app);
 const todoListInDb = ref(db, dbName);
 
+// todo state
+let todos = [];
+
 // Add elements
 const inputFieldEl = document.querySelector("#input-field");
 const addButtonEl = document.querySelector("#add-button");
@@ -32,6 +35,20 @@ const listEl = document.querySelector("#list");
 const deleteModalEl = document.querySelector("#delete-modal");
 const editModalEl = document.querySelector("#edit-modal");
 const editFieldEl = document.querySelector("#edit-field");
+
+// Show
+const showFilter = document.querySelector("#show");
+const filterOptions = document.querySelectorAll('input');
+
+//get the selected radio buttons value
+const getFilterValue = () => Array.from(filterOptions).find((option) => option.checked).value;
+
+// Event listener for filtering
+showFilter.addEventListener("change", (e) => {
+  resetList();
+  renderTodoList(todos)
+});
+
 
 // this is the DTO for the todo item
 const createRecord = (title) => {
@@ -282,8 +299,21 @@ const resetList = () => (listEl.innerHTML = "");
 onValue(todoListInDb, (snapshot) => {
   resetList();
   if (!snapshot?.val()) return;
-  let todoListArray = Object.entries(snapshot.val());
-  const sortedTodoListArray = todoListArray.sort((a, b) => {
+  const todoListArray = Object.entries(snapshot.val());
+  todos = todoListArray;
+  renderTodoList(todoListArray);
+});
+
+const filterOutCompleted = (todoList) => {
+  return todoList.filter((todo) => todo[1].isDone);
+};
+
+const filterOutActive = (todoList) => {
+  return todoList.filter((todo) => !todo[1].isDone);
+};
+
+const sortTodosByDate = (todoList) => {
+  return todoList.sort((a, b) => {
     const aDate = a[1].isDone
       ? new Date(a[1].doneAt)
       : new Date(a[1].createdAt);
@@ -292,10 +322,20 @@ onValue(todoListInDb, (snapshot) => {
       : new Date(b[1].createdAt);
     return bDate - aDate;
   });
-  sortedTodoListArray.forEach(([id, todoItem]) =>
+}
+
+const renderTodoList = (todoList) => {
+  const showFilter = getFilterValue()
+  console.log(showFilter)
+  let todoListArray = [...todoList];
+  if (showFilter === "completed") todoListArray = filterOutCompleted(todoList);
+  if (showFilter === "active") todoListArray = filterOutActive(todoList);
+
+  const sortedTodoListArray = sortTodosByDate(todoListArray);
+  sortedTodoListArray.forEach(([id, todoItem]) => {
     renderTodo({id, ...todoItem})
-  );
-});
+  });
+};
 
 // add event listener to the add button
 addButtonEl.addEventListener("click", () => {
