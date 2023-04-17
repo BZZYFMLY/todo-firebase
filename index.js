@@ -234,7 +234,7 @@ const renderTodo = (record) => {
             className: "btn btn-danger edit",
             event: {
               type: "click",
-              handler: () => {
+              handler: (e) => {
                 editFieldEl.value = record.title;
                 editModalEl.classList.remove("closed");
                 editModalEl
@@ -322,18 +322,17 @@ const sortTodosByDate = (todoList) => {
       : new Date(b[1].createdAt);
     return bDate - aDate;
   });
-}
+};
 
 const renderTodoList = (todoList) => {
-  const showFilter = getFilterValue()
-  console.log(showFilter)
+  const showFilter = getFilterValue();
   let todoListArray = [...todoList];
   if (showFilter === "completed") todoListArray = filterOutCompleted(todoList);
   if (showFilter === "active") todoListArray = filterOutActive(todoList);
 
   const sortedTodoListArray = sortTodosByDate(todoListArray);
   sortedTodoListArray.forEach(([id, todoItem]) => {
-    renderTodo({id, ...todoItem})
+    renderTodo({id, ...todoItem});
   });
 };
 
