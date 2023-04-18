@@ -80,6 +80,7 @@ button:hover {
 
 .todo-container {
   box-shadow: 1px 2px 5px 0px rgba(0,0,0,0.75);
+  cursor: move;
   padding: 1rem 1rem;
   background-color: #DCE1EB;
   border-radius: 1rem;
