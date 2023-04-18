@@ -21,6 +21,9 @@ const app = initializeApp(appSettings);
 const db = getDatabase(app);
 const todoListInDb = ref(db, dbName);
 
+// todo state
+let state = {todos: [], edited: null};
+
 // Add elements
 const inputFieldEl = document.querySelector("#input-field");
 const addButtonEl = document.querySelector("#add-button");
@@ -32,6 +35,20 @@ const listEl = document.querySelector("#list");
 const deleteModalEl = document.querySelector("#delete-modal");
 const editModalEl = document.querySelector("#edit-modal");
 const editFieldEl = document.querySelector("#edit-field");
+
+// Show
+const showFilter = document.querySelector("#show");
+const filterOptions = document.querySelectorAll("input");
+
+//get the selected radio buttons value
+const getFilterValue = () =>
+  Array.from(filterOptions).find((option) => option.checked).value;
+
+// Event listener for filtering
+showFilter.addEventListener("change", (e) => {
+  resetList();
+  renderTodoList(state.todos);
+});
 
 // this is the DTO for the todo item
 const createRecord = (title) => {
@@ -48,6 +65,7 @@ const createElem = ({
   tag,
   id,
   className,
+  draggable,
   text,
   html,
   data,
@@ -65,6 +83,7 @@ const createElem = ({
     src && (elem.src = src);
     alt && (elem.alt = alt);
   }
+  if (draggable) elem.draggable = true;
   if (typeof event === "object") {
     elem.addEventListener(event.type, event.handler);
   }
@@ -166,6 +185,7 @@ const renderTodo = (record) => {
     tag: "li",
     className: "todo-container",
     id: record.id,
+    draggable: true,
     parent: listEl,
     children: [
       {
@@ -218,13 +238,25 @@ const renderTodo = (record) => {
             event: {
               type: "click",
               handler: () => {
+                editFieldEl.focus();
                 editFieldEl.value = record.title;
                 editModalEl.classList.remove("closed");
+                state.edited = record;
                 editModalEl
                   .querySelector("#save-button")
                   .addEventListener("click", () => {
-                    handleEdit(record);
+                    handleEdit(state.edited);
+                    editModalEl.removeEventListener("click", handleEdit);
                   });
+                window.addEventListener("keyup", (e) => {
+                  if (e.key === "Enter") {
+                    handleEdit(state.edited);
+                  }
+                  if (e.key === "Escape") {
+                    editModalEl.classList.add("closed");
+                  }
+                  window.removeEventListener("keyup", handleEdit);
+                });
                 editModalEl
                   .querySelector("#cancel-edit-button")
                   .addEventListener("click", () => {
@@ -255,6 +287,15 @@ const renderTodo = (record) => {
                   .addEventListener("click", () => {
                     deleteModalEl.classList.add("closed");
                   });
+                window.addEventListener("keyup", (e) => {
+                  if (e.key === "Enter") {
+                    handleDelete(record);
+                  }
+                  if (e.key === "Escape") {
+                    deleteModalEl.classList.add("closed");
+                  }
+                  window.removeEventListener("keyup", handleEdit);
+                });
               },
             },
             children: {
@@ -282,9 +323,42 @@ const resetList = () => (listEl.innerHTML = "");
 onValue(todoListInDb, (snapshot) => {
   resetList();
   if (!snapshot?.val()) return;
-  let todoListArray = Object.entries(snapshot.val());
-  todoListArray.forEach(([id, todoItem]) => renderTodo({id, ...todoItem}));
+  const todoListArray = Object.entries(snapshot.val());
+  state.todos = todoListArray;
+  renderTodoList(todoListArray);
 });
+
+const filterOutCompleted = (todoList) => {
+  return todoList.filter((todo) => todo[1].isDone);
+};
+
+const filterOutActive = (todoList) => {
+  return todoList.filter((todo) => !todo[1].isDone);
+};
+
+const sortTodosByDate = (todoList) => {
+  return todoList.sort((a, b) => {
+    const aDate = a[1].isDone
+      ? new Date(a[1].doneAt)
+      : new Date(a[1].createdAt);
+    const bDate = a[1].isDone
+      ? new Date(b[1].doneAt)
+      : new Date(b[1].createdAt);
+    return bDate - aDate;
+  });
+};
+
+const renderTodoList = (todoList) => {
+  const showFilter = getFilterValue();
+  let todoListArray = [...todoList];
+  if (showFilter === "completed") todoListArray = filterOutCompleted(todoList);
+  if (showFilter === "active") todoListArray = filterOutActive(todoList);
+
+  const sortedTodoListArray = sortTodosByDate(todoListArray);
+  sortedTodoListArray.forEach(([id, todoItem]) => {
+    renderTodo({id, ...todoItem});
+  });
+};
 
 // add event listener to the add button
 addButtonEl.addEventListener("click", () => {
